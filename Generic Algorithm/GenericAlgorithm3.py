@@ -37,19 +37,32 @@ class GA(object):
 
     def get_fitness(self, leftarr, rightarr):
         fitness = np.empty((self.pop_size,), dtype=np.float64)
+        # print("leftarr", leftarr)
+        # print("rightarr", rightarr)
+        cnt = 0
         for leftlst, rightlst in zip(leftarr, rightarr):
             left_taste_list, left_health_list = [leftlst[i][0] for i in range(len(leftlst))], [leftlst[i][1] for i in range(len(leftlst))]
             right_taste_list, right_health_list = [rightlst[i][0] for i in range(len(rightlst))], [rightlst[i][1] for i in range(len(rightlst))]
             # much more important
-            print(left_taste_list)
+            # print(left_taste_list)
             left_taste_revcnt = mtl.CountInversions(left_taste_list, "decrease")
             right_health_revcnt = mtl.CountInversions(right_health_list, "increase")
             # less important
             left_health_revcnt = mtl.CountInversions(left_health_list, "increase")
             right_taste_revcnt = mtl.CountInversions(right_taste_list, "decrease")
+            # print("left_taste_revcnt",left_taste_revcnt)
+            # print("right_health_revcnt", right_health_revcnt)
+            # print("left_health_revcnt", left_health_revcnt)
+            # print("right_taste_revcnt",right_taste_revcnt)
             # calculate the cost and fitness
             cost = self.theta1*(left_taste_revcnt+right_health_revcnt) + self.theta2*(left_health_revcnt+right_taste_revcnt)
-            fitness[i] = mtl.sigmoid(cost)
+            # print("leftlst", leftlst)
+            # print("rightlst", rightlst)
+            # print cost
+            # print("fitness",1.0/cost)
+            fitness[cnt] = 1.0/(cost+0.1)
+            cnt = cnt + 1
+        # print("fitness", fitness)
         return fitness
 
     def select(self, fitness):
@@ -68,10 +81,10 @@ class GA(object):
                    [6, 0]])
             '''
             keep_city = parent[~cross_points]
-            print("----------", pop)
-            print("------", pop[i_][0])   
-            print("---", keep_city)                                    # find the city number
-            swap_city = pop[i_, mtl.isin(mtl.ravel(pop[i_][0]), keep_city, invert=True)]
+            # print("----------", pop)
+            # print("------", pop[i_][0])   
+            # print("---", keep_city)                                    # find the city number
+            swap_city = pop[i_, mtl.isin(pop[i_][0].tolist(), keep_city.tolist(), invert=True)]
             parent[:] = np.concatenate((keep_city, swap_city))
         return parent
 
@@ -118,6 +131,7 @@ for generation in range(N_GENERATIONS):
     best_idx = np.argmax(fitness)
     print('Gen:', generation, '| best fit: %.2f' % fitness[best_idx])
     print('Best Sort:', ga.pop[best_idx])
+    
     ga.evolve(fitness)   
 
     # env.plotting(lx[best_idx], ly[best_idx], total_distance[best_idx])
