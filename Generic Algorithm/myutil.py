@@ -3,11 +3,35 @@ import numpy as np
 def sigmoid(inX):
 	return 1.0 / (1+np.exp(-inX))
 
-def isin():
-	pass
+def isin(origin, filter, invert=False):
+	# print "origin", origin
+	# print "filter", filter
+	ret_lst = []
+	if invert == True:
+		# if filter element is in origin, return false; else, return true
+		for ele in origin:
+			if ele in filter:
+				ret_lst.append(False)
+				ind = filter.index(ele)
+				del filter[ind]
+			else:
+				ret_lst.append(True)
+	elif invert == False:
+		# if filter element is in origin, return true; else, return false
+		for ele in origin:
+			if ele in filter:
+				ret_lst.append(True)
+				ind = filter.index(ele)
+				del filter[ind]
+			else:
+				ret_lst.append(False)
 
-def ravel():
-	pass
+	return ret_lst
+
+			
+
+# def ravel(ele):
+# 	print("ele=", ele.shape)
 
 def MergeAndCount(lst, left, mid, right, temp):
 	i = left
