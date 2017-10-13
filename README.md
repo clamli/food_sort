@@ -15,3 +15,11 @@
 	* Fitness function
 	* Cross-over method
 		* Every vector should be included in the sequence *(refering to TSP problem solved by generic algorithm)*
+	* Mutation function
+		* Change the position in one sequence randomly
+	
+	* Run
+	```python GenericAlgorithm3.py```
+### Dependence
+- Python 3.5
+	
