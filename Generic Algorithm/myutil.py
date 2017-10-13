@@ -69,10 +69,10 @@ def MergeSortAndCount(lst, left, right, temp):
 	if (left >= right):
 		return 0
 
-	mid = (left + right) / 2;
-	InversionCnt1 = MergeSortAndCount(lst, left, mid, temp);
-	InversionCnt2 = MergeSortAndCount(lst, mid+1, right, temp);
-	MergeInversionCnt = MergeAndCount(lst, left, mid, right, temp);
+	mid = int((left + right) / 2)
+	InversionCnt1 = MergeSortAndCount(lst, left, mid, temp)
+	InversionCnt2 = MergeSortAndCount(lst, mid+1, right, temp)
+	MergeInversionCnt = MergeAndCount(lst, left, mid, right, temp)
 
 	return InversionCnt1 + InversionCnt2 + MergeInversionCnt
 

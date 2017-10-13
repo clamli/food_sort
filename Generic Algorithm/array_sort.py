@@ -1,9 +1,9 @@
 def VectorInput():
-	num = input("Number of vectors: ")
+	num = int(input("Number of vectors: "))
 	taste_health_list = []
 	for i in range(num):
 		taste_health_list.append(input("<Taste, Health> %d: "%(i+1)))
-	print taste_health_list
+	print(taste_health_list)
 	return taste_health_list
 
 def MergeAndCount(lst, left, mid, right, temp):
@@ -39,13 +39,14 @@ def MergeAndCount(lst, left, mid, right, temp):
 
 
 def MergeSortAndCount(lst, left, right, temp):
+	# print(lst)
 	if (left >= right):
 		return 0
 
-	mid = (left + right) / 2;
-	InversionCnt1 = MergeSortAndCount(lst, left, mid, temp);
-	InversionCnt2 = MergeSortAndCount(lst, mid+1, right, temp);
-	MergeInversionCnt = MergeAndCount(lst, left, mid, right, temp);
+	mid = int((left + right) / 2)
+	InversionCnt1 = MergeSortAndCount(lst, left, mid, temp)
+	InversionCnt2 = MergeSortAndCount(lst, mid+1, right, temp)
+	MergeInversionCnt = MergeAndCount(lst, left, mid, right, temp)
 
 	return InversionCnt1 + InversionCnt2 + MergeInversionCnt
 
@@ -54,7 +55,8 @@ def CountInversions(lst, type):
 	if type == "decrease":
 		lst.reverse()
 	temp = [0]*len(lst)
-	return MergeSortAndCount(lst, 0, len(lst)-1, temp)
+	cnt = MergeSortAndCount(lst, 0, len(lst)-1, temp)
+	return cnt
 
 
 def CostFunction(midvec, leftlst, rightlst, theta1=1.0, theta2=1.0, theta3=1.0):
@@ -62,7 +64,7 @@ def CostFunction(midvec, leftlst, rightlst, theta1=1.0, theta2=1.0, theta3=1.0):
 	right_taste_list, right_health_list = [rightlst[i][0] for i in range(len(rightlst))], [rightlst[i][1] for i in range(len(rightlst))]
 
 	# left_taste_revcnt = CountRevPair(leftlst, "decrease");
-	print "-----", left_health_list
+	print("-----", left_health_list)
 	left_health_revcnt = CountInversions(left_health_list, "increase")
 	right_taste_revcnt = CountInversions(right_taste_list, "decrease")
 	mid_ifluen = midvec[0] + midvec[1]
