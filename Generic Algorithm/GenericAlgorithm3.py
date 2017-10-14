@@ -4,14 +4,14 @@ import math
 import numpy as np
 
 DNA_SIZE = 10  # DNA size
-CROSS_RATE = 0.1
-MUTATE_RATE = 0.02
+CROSS_RATE = 0.2
+MUTATE_RATE = 0.01
 POP_SIZE = 500
-N_GENERATIONS = 500
+N_GENERATIONS = 1000
 
 
 class GA(object):
-	def __init__(self, DNA_size, cross_rate, mutation_rate, pop_size, value_bound=10, pop=None, theta1=1.0, theta2=0.0):
+	def __init__(self, DNA_size, cross_rate, mutation_rate, pop_size, value_bound=10, pop=None, theta1=10.0, theta2=1.0, theta3=1.0, theta4=5.0):
 		self.DNA_size = DNA_size          # food sequence size
 		self.cross_rate = cross_rate
 		self.mutate_rate = mutation_rate
@@ -26,44 +26,37 @@ class GA(object):
 		self.right_bound = self.left_bound
 		self.theta1 = theta1
 		self.theta2 = theta2
+		self.theta3 = theta3
+		self.theta4 = theta4
 
-    # def translateDNA(self, DNA, city_position):     # get cities' coord in order
-    #     line_x = np.empty_like(DNA, dtype=np.float64)
-    #     line_y = np.empty_like(DNA, dtype=np.float64)
-    #     for i, d in enumerate(DNA):
-    #         city_coord = city_position[d]
-    #         line_x[i, :] = city_coord[:, 0]
-    #         line_y[i, :] = city_coord[:, 1]
-    #     return line_x, line_y
-
-	def get_fitness(self, leftarr, rightarr):
+	def get_fitness(self):
 		fitness = np.empty((self.pop_size,), dtype=np.float64)
-		# print("leftarr", leftarr)
-		# print("rightarr", rightarr)
-		cnt = 0
-		for leftlst, rightlst in zip(leftarr, rightarr):
+		leftarr = [self.pop[ind][0:ga.left_bound+1].tolist() for ind in range(ga.pop_size)]
+		rightarr = [self.pop[ind][ga.right_bound:].tolist() for ind in range(ga.pop_size)]
+		# print("pop", self.pop[0][0])
+		cost = np.empty((self.pop_size,), dtype=np.float64)
+		for leftlst, rightlst, popele, cnt in zip(leftarr, rightarr, self.pop, range(ga.pop_size)):
+			###################### inverse pairing ######################
 			left_taste_list, left_health_list = [leftlst[i][0] for i in range(len(leftlst))], [leftlst[i][1] for i in range(len(leftlst))]
 			right_taste_list, right_health_list = [rightlst[i][0] for i in range(len(rightlst))], [rightlst[i][1] for i in range(len(rightlst))]
 			# much more important
-			# print(left_taste_list)
 			left_taste_revcnt = mtl.CountInversions(left_taste_list, "decrease")
 			right_health_revcnt = mtl.CountInversions(right_health_list, "increase")
 			# less important
 			left_health_revcnt = mtl.CountInversions(left_health_list, "increase")
 			right_taste_revcnt = mtl.CountInversions(right_taste_list, "decrease")
-			# print("left_taste_revcnt",left_taste_revcnt)
-			# print("right_health_revcnt", right_health_revcnt)
-			# print("left_health_revcnt", left_health_revcnt)
-			# print("right_taste_revcnt",right_taste_revcnt)
-			# calculate the cost and fitness
-			cost = self.theta1*(left_taste_revcnt+right_health_revcnt) + self.theta2*(left_health_revcnt+right_taste_revcnt)
-			# print("leftlst", leftlst)
-			# print("rightlst", rightlst)
-			# print cost
-			# print("fitness",1.0/cost)
-			fitness[cnt] = 1.0/(cost+5)
-			cnt = cnt + 1
-			# print("fitness", fitness)
+			#################### neighbor difference ####################
+			neighbor_difference = mtl.CalDifference(popele)
+			####################### middle weigh ########################
+			middle_weigh = popele[self.left_bound][0] + popele[self.left_bound][1]
+
+			cost[cnt] = self.theta1*(left_taste_revcnt+right_health_revcnt) \
+						+ self.theta2*(left_health_revcnt+right_taste_revcnt) \
+							+ self.theta3*neighbor_difference \
+								+ self.theta4*middle_weigh
+		cost = pow(cost / (np.max(cost.tolist()) - np.min(cost.tolist())), 2)
+
+		fitness = pow(self.DNA_size/mtl.sigmoid(cost, 10), 2)
 		return fitness
 
 	def select(self, fitness):
@@ -129,15 +122,17 @@ class TravelSalesPerson(object):
 
 
 ga = GA(DNA_size=DNA_SIZE, cross_rate=CROSS_RATE, mutation_rate=MUTATE_RATE, pop_size=POP_SIZE, value_bound=10, pop=None, theta1=1.0, theta2=0.0)
-print("first---------", ga.pop)
+# print("first---------", ga.pop)
 # env = TravelSalesPerson(N_CITIES)
+best_fit_lst = []
+plt.figure(1)
 for generation in range(N_GENERATIONS):
 	# lx, ly = ga.translateDNA(ga.pop, env.city_position)
-	fitness = ga.get_fitness([ga.pop[ind][0:ga.left_bound+1].tolist() for ind in range(ga.pop_size)], 
-	                         [ga.pop[ind][ga.right_bound:].tolist() for ind in range(ga.pop_size)])
+	fitness = ga.get_fitness()
 	best_idx = np.argmax(fitness)
 	print('Gen:', generation, '| best fit: %.2f' % fitness[best_idx])
-	print('Best Sort:', ga.pop[best_idx])
+	print('Best Sort:\n', ga.pop[best_idx])
+	best_fit_lst.append(fitness[best_idx])
 	# print("result:", ga.pop[best_idx][0:ga.left_bound].tolist())
 	# print(ga.left_bound)
 	ga.evolve(fitness)   
@@ -145,4 +140,8 @@ for generation in range(N_GENERATIONS):
     # env.plotting(lx[best_idx], ly[best_idx], total_distance[best_idx])
 
 # plt.ioff()
-# plt.show()
+plt.title("Change of Best Fitness")
+plt.xlabel("Generation")
+plt.ylabel("Best Fitness")
+plt.plot(best_fit_lst)
+plt.show()
