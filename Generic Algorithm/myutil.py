@@ -1,7 +1,7 @@
 import numpy as np
 
-def sigmoid(inX):
-	return 1.0 / (1+np.exp(-inX))
+def sigmoid(inX, param):
+	return 1.0 / (1+np.exp(-param*inX))
 
 def isin(origin, filter, invert=False):
 	# print "origin", origin
@@ -83,3 +83,13 @@ def CountInversions(lst, type):
 		lst.reverse()
 	temp = [0]*len(lst)
 	return MergeSortAndCount(lst, 0, len(lst)-1, temp)
+
+
+def CalDifference(lst):
+	'''calculate the difference between neighbors'''
+	difference = 0
+	for i in range(len(lst)-1):
+		difference = difference + np.abs(lst[i][0] - lst[i+1][0]) + np.abs(lst[i][1] - lst[i+1][1])
+	return difference
+
+
