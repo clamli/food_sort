@@ -11,7 +11,7 @@ N_GENERATIONS = 1000
 
 
 class GA(object):
-	def __init__(self, DNA_size, cross_rate, mutation_rate, pop_size, value_bound=10, pop=None, theta1=10.0, theta2=1.0, theta3=1.0, theta4=5.0):
+	def __init__(self, DNA_size, cross_rate, mutation_rate, pop_size, value_bound=10, pop=None, theta1=10.0, theta2=1.0, theta3=1.0, theta4=10.0):
 		self.DNA_size = DNA_size          # food sequence size
 		self.cross_rate = cross_rate
 		self.mutate_rate = mutation_rate
@@ -54,9 +54,11 @@ class GA(object):
 						+ self.theta2*(left_health_revcnt+right_taste_revcnt) \
 							+ self.theta3*neighbor_difference \
 								+ self.theta4*middle_weigh
-		cost = pow(cost / (np.max(cost.tolist()) - np.min(cost.tolist())), 2)
+		#### pow(cost / (np.max(cost.tolist()) - np.min(cost.tolist())), 2)
+		# cost = pow(cost, 2)
 
-		fitness = pow(self.DNA_size/mtl.sigmoid(cost, 10), 2)
+		#### pow(self.DNA_size/mtl.sigmoid(cost, 20), 2)
+		fitness = pow(POP_SIZE*DNA_SIZE / cost, 2)
 		return fitness
 
 	def select(self, fitness):
