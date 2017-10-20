@@ -19,7 +19,7 @@
 		* Change the position in one sequence randomly
 	
 	* Run
-	```python GenericAlgorithm3.py```
+	```python GenericAlgorithm.py```
 ### Dependence
 - Python 3.5
 	
