@@ -12,14 +12,18 @@ N_GENERATIONS = 100
 
 
 class GA(object):
-	def __init__(self, DNA_size, cross_rate, mutation_rate, pop_size, value_bound=10, pop_type='default', theta1=10.0, theta2=1.0, theta3=1.0, theta4=3.0):
+	def __init__(self, DNA_size, cross_rate, mutation_rate, pop_size, value_bound=10, data_type='random', pop_type='default', theta1=10.0, theta2=1.0, theta3=1.0, theta4=3.0):
 		self.DNA_size = DNA_size          # food sequence size
 		self.cross_rate = cross_rate
 		self.mutate_rate = mutation_rate
 		self.pop_size = pop_size          # sequence pool size
 		self.value_bound = value_bound    # health/taste bound
 		#### define how to generate data
-		self.target = [np.random.randint(0, self.value_bound, size=2) for _ in range(self.DNA_size)]	
+		if data_type == 'random':
+			self.target = [np.random.randint(0, self.value_bound, size=2) for _ in range(self.DNA_size)]
+		elif data_type == 'file':
+			col_name_lst, nutrient_dict = load_nutrient_data('100_foods_calorie_and_core_nutrients.xlsx')
+			self.target = combine_data('Energy (kcal)', 'Sodium (mg)', col_name_lst, nutrient_dict, plot='False')
 		self.generate_init_data(pop_type, self.target)
 		#### set necessary parameters for generic algorithm
 		self.left_bound = int(DNA_size/2)
@@ -129,7 +133,7 @@ class GA(object):
 		self.pop = pop
 
 
-ga = GA(DNA_size=DNA_SIZE, cross_rate=CROSS_RATE, mutation_rate=MUTATE_RATE, pop_size=POP_SIZE, value_bound=10, pop_type='default', theta1=1.0, theta2=0.0)
+ga = GA(DNA_size=DNA_SIZE, cross_rate=CROSS_RATE, mutation_rate=MUTATE_RATE, pop_size=POP_SIZE, value_bound=10, data_type='random', pop_type='default', theta1=1.0, theta2=0.0)
 best_fit_lst1 = []
 best_fit_lst2 = []
 best_fit_lst3 = []
@@ -187,7 +191,7 @@ for generation in range(N_GENERATIONS):
 
 #### plot result ####
 plt.figure(1)
-plt.title("Best taste and health trend for each dataset")
+plt.title("Best taste and health trend for default dataset")
 plt.xlabel("item number")
 plt.ylabel("taste/health value")
 plt.plot(range(1, len(max_seq1)+1), [max_seq1[i][0] for i in range(len(max_seq1))], 'r-', label="taste_d", marker='*')
@@ -195,7 +199,7 @@ plt.plot(range(1, len(max_seq1)+1), [max_seq1[i][1] for i in range(len(max_seq1)
 plt.xlim(0.0, 10.0)
 plt.ylim(0.0, 10.0)
 plt.figure(2)
-plt.title("Best taste and health trend for each dataset")
+plt.title("Best taste and health trend for inverse proportional function  dataset")
 plt.xlabel("item number")
 plt.ylabel("taste/health value")
 plt.plot(range(1, len(max_seq2)+1), [max_seq2[i][0] for i in range(len(max_seq2))], 'g-', label="taste_iv", marker='*')
@@ -203,7 +207,7 @@ plt.plot(range(1, len(max_seq2)+1), [max_seq2[i][1] for i in range(len(max_seq2)
 plt.xlim(0.0, 10.0)
 plt.ylim(0.0, 10.0)
 plt.figure(3)
-plt.title("Best taste and health trend for each dataset")
+plt.title("Best taste and health trend for directly proportional function dataset")
 plt.xlabel("item number")
 plt.ylabel("taste/health value")
 plt.plot(range(1, len(max_seq3)+1), [max_seq3[i][0] for i in range(len(max_seq3))], 'b-', label="taste_dp", marker='*')

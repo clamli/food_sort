@@ -1,4 +1,6 @@
 import numpy as np
+import xlrd
+import matplotlib.pyplot as plt
 
 def sigmoid(inX, param):
 	return 1.0 / (1+np.exp(-param*inX))
@@ -91,5 +93,35 @@ def CalDifference(lst):
 	for i in range(len(lst)-1):
 		difference = difference + np.abs(lst[i][0] - lst[i+1][0]) + np.abs(lst[i][1] - lst[i+1][1])
 	return difference
+
+
+def load_nutrient_data(filename):
+	nutrient_data = xlrd.open_workbook('./100_foods_calorie_and_core_nutrients.xlsx')
+	first_row_name = nutrient_data.row_values(0)
+	nutrient_dict = { ind: [] for ind in range(2, len(first_row)) }
+	for i in range(1, nutrient_data.nrows):
+		for value, ind in zip(nutrient_data.row_values(i)[2:], range(2, len(nutrient_data.row_values(i)))):
+			nutrient_dict[ind].append(value)
+	return first_row_name, nutrient_dict
+
+
+def combine_data(col_name1, col_name2, col_name_lst, nutrient_dict, plot='True'):
+	ret_lst = []
+	for l1,l2 in zip(nutrient_dict[col_name_lst.index(col_name1)], nutrient_dict[col_name_lst.index(col_name2)]):
+		ret_lst.append([l1, l2])
+	if plot == 'True':
+		plt.figure(1)
+		plt.title("Nutrient data")
+		plt.xlabel(col_name1)
+		plt.ylabel(col_name2)
+		plt.plot(range(1, len(ret_lst)+1), [ret_lst[i][0] for i in range(len(ret_lst))], 'r-', label=col_name1, marker='*')
+		plt.plot(range(1, len(ret_lst)+1), [ret_lst[i][1] for i in range(len(ret_lst))], 'b--', label=col_name2, marker='*')
+		plt.show()
+
+	return ret_lst
+
+
+
+
 
 
