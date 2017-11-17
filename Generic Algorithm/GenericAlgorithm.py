@@ -2,11 +2,11 @@ import numpy as np
 import myutil as mtl
 import math
 import numpy as np
-from copy import deepcopy
+
 
 
 class GA(object):
-    def __init__(self, DNA_size, cross_rate, mutation_rate, pop_size, value_bound=10, data='random', pop_type='default', theta1=10.0, theta2=1.0, theta3=1.0, theta4=3.0):
+    def __init__(self, DNA_size, cross_rate, mutation_rate, pop_size, value_bound=10, data='random', pop_type='default', theta1=60.0, theta2=62.0, theta3=1.0, theta4=3.0, theta5=10.0, theta6=10.0, theta7=1.0, theta8=3.0, theta9=35, theta10=35):
         self.DNA_size = DNA_size          # food sequence size
         self.cross_rate = cross_rate
         self.mutate_rate = mutation_rate
@@ -23,6 +23,12 @@ class GA(object):
         self.theta2 = theta2
         self.theta3 = theta3
         self.theta4 = theta4
+        self.theta5 = theta5
+        self.theta6 = theta6
+        self.theta7 = theta7
+        self.theta8 = theta8
+        self.theta9 = theta9
+        self.theta10 = theta10
 
     def set_data(self, pop_type, target):
         self.DNA_size = len(target)
@@ -31,11 +37,17 @@ class GA(object):
         self.right_bound = self.left_bound
         return gen_result
         
-    def change_parameters(self, theta1, theta2, theta3, theta4):
+    def change_parameters(self, theta1, theta2, theta3, theta4, theta5, theta6, theta7, theta8, theta9, theta10):
         self.theta1 = theta1
         self.theta2 = theta2
         self.theta3 = theta3
         self.theta4 = theta4
+        self.theta5 = theta5
+        self.theta6 = theta6
+        self.theta7 = theta7
+        self.theta8 = theta8
+        self.theta9 = theta9
+        self.theta10 = theta10
 
     def generate_init_data(self, pop_type, init_items):
         '''Generate different kinds of init data'''
@@ -69,20 +81,28 @@ class GA(object):
             # much more important
             left_taste_revcnt = mtl.CountInversions(left_taste_list, "decrease")
             right_health_revcnt = mtl.CountInversions(right_health_list, "increase")
+            sum_left_taste_list = sum(left_taste_list)
+            sum_right_health_list = sum(right_health_list)
             # less important
             left_health_revcnt = mtl.CountInversions(left_health_list, "increase")
             right_taste_revcnt = mtl.CountInversions(right_taste_list, "decrease")
+            sum_left_health_list = sum(left_health_list)
+            sum_right_taste_list = sum(right_taste_list)
             #################### neighbor difference ####################
             neighbor_difference = mtl.CalDifference(popele)
             ####################### middle weigh ########################
             middle_weigh[cnt] = popele[self.left_bound][0] + popele[self.left_bound][1]
 
-            cost[cnt] = (self.theta1*(left_taste_revcnt+right_health_revcnt) \
-                        + self.theta2*(left_health_revcnt+right_taste_revcnt) \
-                            + self.theta3*neighbor_difference) 
+            cost[cnt] = (self.theta1*left_taste_revcnt + \
+                            self.theta2*right_health_revcnt + \
+                                self.theta3*right_taste_revcnt + \
+                                    self.theta4*left_health_revcnt + \
+                                    	self.theta5*sum_left_health_list +\
+                            				self.theta6*sum_right_taste_list +\
+                                        		self.theta7*neighbor_difference)
 
         #### get fitness of all DNA
-        fitness = pow(self.DNA_size*self.pop_size /(self.theta1+cost), 2) + self.theta4*middle_weigh
+        fitness = pow((self.theta8*middle_weigh+self.theta9*sum_left_taste_list+self.theta10*sum_right_health_list) /cost, 2)
         return fitness
 
     def select(self, fitness):

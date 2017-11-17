@@ -7,7 +7,7 @@ import myutil as mtl
 DNA_SIZE = 10  # DNA size
 CROSS_RATE = 0.2
 MUTATE_RATE = 0.01
-POP_SIZE = 500
+POP_SIZE = 1000
 N_GENERATIONS = 1000
 filename = './22_food_for_McDonald.xlsx'
 column1 = 'Taste'
@@ -19,7 +19,7 @@ target = mtl.combine_data(column1, column2, col_name_lst, nutrient_dict, plot='F
 gen_seq = ga.set_data('default', target)
 # ga.set_data('inverse proportional function', target)
 # ga.set_data('directly proportional function', target)
-ga.change_parameters(15, 10, 25, 0)
+ga.change_parameters(theta1=60.0, theta2=62.0, theta3=1.0, theta4=3.0, theta5=10.0, theta6=10.0, theta7=1.0, theta8=3.0, theta9=35, theta10=40)
 
 max_fitness = 0
 best_fit_lst = []

@@ -19,7 +19,7 @@ target = mtl.combine_data(column1, column2, col_name_lst, nutrient_dict, plot='F
 gen_seq = ga.set_data('default', target[0:20])
 # ga.set_data('inverse proportional function', target)
 # ga.set_data('directly proportional function', target)
-ga.change_parameters(10, 10, 0, 0)
+ga.change_parameters(theta1=60.0, theta2=62.0, theta3=1.0, theta4=3.0, theta5=10.0, theta6=10.0, theta7=1.0, theta8=3.0, theta9=30, theta10=75)
 
 max_fitness = 0
 best_fit_lst = []
@@ -48,8 +48,8 @@ for generation in range(N_GENERATIONS):
     if generation != 0:
 	    ax.lines.pop(0)
 	    ax.lines.pop(0)
-    lines = ax.plot(range(1, len(ga.pop[best_idx])+1), [ga.pop[best_idx][i][0] for i in range(len(ga.pop[best_idx]))], 'r-', label="taste", marker='*')
-    lines = ax.plot(range(1, len(ga.pop[best_idx])+1), [ga.pop[best_idx][i][1] for i in range(len(ga.pop[best_idx]))], 'b--', label="health", marker='*')
+    lines = ax.plot(range(1, len(ga.pop[best_idx])+1), [ga.pop[best_idx][i][0] for i in range(len(ga.pop[best_idx]))], 'r-', label=column1, marker='*')
+    lines = ax.plot(range(1, len(ga.pop[best_idx])+1), [ga.pop[best_idx][i][1] for i in range(len(ga.pop[best_idx]))], 'b--', label=column2, marker='*')
     plt.legend(loc = 'upper left')
     plt.pause(0.01)
 
