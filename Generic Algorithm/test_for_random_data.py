@@ -48,3 +48,14 @@ plt.plot(range(1, len(max_seq1)+1), [max_seq1[i][0] for i in range(len(max_seq1)
 plt.plot(range(1, len(max_seq1)+1), [max_seq1[i][1] for i in range(len(max_seq1))], 'b--', label="health", marker='*')
 plt.legend(loc = 'upper left')
 plt.show()
+
+
+fitness, best_seq = ga.adjust(max_seq1)
+plt.title("Best taste and health trend for default dataset after fuzzy adjustment")
+plt.xlabel("item number")
+plt.ylabel("taste/health value")
+plt.plot(range(1, len(best_seq)+1), [best_seq[i][0] for i in range(len(best_seq))], 'r-', label="taste", marker='*')
+plt.plot(range(1, len(best_seq)+1), [best_seq[i][1] for i in range(len(best_seq))], 'b--', label="health", marker='*')
+plt.legend(loc = 'upper left')
+plt.show()
+
