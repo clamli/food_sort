@@ -19,7 +19,9 @@
 		* Change the position in one sequence randomly
 	
 	* Run
-	```python GenericAlgorithm.py```
+	```python test_for_random_data.py```
+	```python test_for_nutrient_data.py```
+	```python test_for_mcdonald_data.py```
 ### Dependence
 - Python 3.5
 	
