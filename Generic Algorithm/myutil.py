@@ -100,14 +100,17 @@ def load_nutrient_data(filename):
     nutrient_data = nutrient_book.sheets()[0]
     first_row_name = nutrient_data.row_values(0)
     nutrient_dict = { ind: [] for ind in range(2, len(first_row_name)) }
+    name_lst = []
     for i in range(1, nutrient_data.nrows):
         for value, ind in zip(nutrient_data.row_values(i)[2:], range(2, len(nutrient_data.row_values(i)))):
             nutrient_dict[ind].append(value)
-    return first_row_name, nutrient_dict
+        name_lst.append(nutrient_data.row_values(i)[0])
+    return first_row_name, nutrient_dict, name_lst
 
 
 def combine_data(col_name1, col_name2, col_name_lst, nutrient_dict, plot='True'):
     ret_lst = []
+    # print(nutrient_dict)
     for l1,l2 in zip(nutrient_dict[col_name_lst.index(col_name1)], nutrient_dict[col_name_lst.index(col_name2)]):
         ret_lst.append([l1, l2])
     if plot == 'True':
