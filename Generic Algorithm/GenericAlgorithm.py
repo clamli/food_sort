@@ -7,7 +7,7 @@ from copy import deepcopy
 
 
 class GA(object):
-	def __init__(self, DNA_size, cross_rate, mutation_rate, pop_size, value_bound=10, data='random', pop_type='default', theta1=60.0, theta2=62.0, theta3=1.0, theta4=3.0, theta5=10.0, theta6=10.0, theta7=1.0, theta8=3.0, theta9=35, theta10=35):
+	def __init__(self, DNA_size, cross_rate, mutation_rate, pop_size, value_bound=10, data='random', pop_type='default', theta1=60.0, theta2=62.0, theta3=1.0, theta4=3.0, theta5=40.0, theta6=10.0, theta7=1.0, theta8=3.0, theta9=35, theta10=50):
 		self.DNA_size = DNA_size		  # food sequence size
 		self.cross_rate = cross_rate
 		self.mutate_rate = mutation_rate
@@ -29,7 +29,7 @@ class GA(object):
 		self.theta7 = theta7			  # neighbor_difference
 		self.theta8 = theta8			  # middle_weigh
 		self.theta9 = theta9			  # sum_left_taste_list
-		self.theta10 = theta10			# sum_right_health_list
+		self.theta10 = theta10			  # sum_right_health_list
 
 	def set_data(self, pop_type, target):
 		self.DNA_size = len(target)
@@ -157,22 +157,24 @@ class GA(object):
 			parent[:] = child
 		self.pop = pop
 
-	def adjust(self, best_seq, pfuzzy=0.5):
+	def adjust(self, best_seq, pfuzzy_t=0.5, pfuzzy_h=0.5):
 		# fitness = np.empty((self.pop_size,), dtype=np.float64)
 
 		tmp_seq = deepcopy(best_seq)
 		for ind in range(len(best_seq)-1):
 			# current fitness
-			leftlst = best_seq[0:self.left_bound+1].tolist()
-			rightlst = best_seq[self.right_bound:].tolist()
+			leftlst = tmp_seq[0:self.left_bound+1].tolist()
+			rightlst = tmp_seq[self.right_bound:].tolist()
 			left_taste_list, left_health_list = [leftlst[i][0] for i in range(len(leftlst))], [leftlst[i][1] for i in range(len(leftlst))]
 			right_taste_list, right_health_list = [rightlst[i][0] for i in range(len(rightlst))], [rightlst[i][1] for i in range(len(rightlst))]
-			max_fitness = self.cal_fitness(left_taste_list, right_health_list, left_health_list, right_taste_list, best_seq)
-			max_seq = deepcopy(best_seq)
+			max_fitness = self.cal_fitness(left_taste_list, right_health_list, left_health_list, right_taste_list, tmp_seq)
+			max_seq = deepcopy(tmp_seq)
 
-			# ind: taste + fuzzy; ind+1: taste - fuzzy
-			tmp_seq[ind][0] += pfuzzy
-			tmp_seq[ind+1][0] -= pfuzzy
+			# ind: taste + fuzzy;
+			# ind+1: taste - fuzzy;
+			tmp_seq[ind][0] += pfuzzy_t
+			if tmp_seq[ind+1][0] >= pfuzzy_t:
+				tmp_seq[ind+1][0] -= pfuzzy_t
 			leftlst = tmp_seq[0:self.left_bound+1].tolist()
 			rightlst = tmp_seq[self.right_bound:].tolist()
 			left_taste_list, left_health_list = [leftlst[i][0] for i in range(len(leftlst))], [leftlst[i][1] for i in range(len(leftlst))]
@@ -181,10 +183,14 @@ class GA(object):
 			if fitness > max_fitness:
 				max_fitness = fitness
 				max_seq = deepcopy(tmp_seq)
-			tmp_seq = deepcopy(best_seq)
-			# ind: taste - fuzzy; ind+1: taste + fuzzy
-			tmp_seq[ind][0] -= pfuzzy
-			tmp_seq[ind+1][0] += pfuzzy
+			#  = deepcopy(max_seq)
+			tmp_seq = deepcopy(max_seq)
+			
+			# ind: taste - fuzzy;
+			# ind+1: taste + fuzzy;
+			tmp_seq[ind+1][0] + pfuzzy_t
+			if tmp_seq[ind][0] >= pfuzzy_t:
+				tmp_seq[ind][0] -= pfuzzy_t
 			leftlst = tmp_seq[0:self.left_bound+1].tolist()
 			rightlst = tmp_seq[self.right_bound:].tolist()
 			left_taste_list, left_health_list = [leftlst[i][0] for i in range(len(leftlst))], [leftlst[i][1] for i in range(len(leftlst))]
@@ -193,11 +199,44 @@ class GA(object):
 			if fitness > max_fitness:
 				max_fitness = fitness
 				max_seq = deepcopy(tmp_seq)
-			best_seq = deepcopy(max_seq)
-			tmp_seq = deepcopy(best_seq)
+			# best_seq = deepcopy(max_seq)
+			tmp_seq = deepcopy(max_seq)
+			
+			# ind: health + fuzzy;
+			# ind+1: health - fuzzy;
+			tmp_seq[ind][1] += pfuzzy_h
+			if tmp_seq[ind+1][1] >= pfuzzy_h:
+				tmp_seq[ind+1][1] -= pfuzzy_h
+			leftlst = tmp_seq[0:self.left_bound+1].tolist()
+			rightlst = tmp_seq[self.right_bound:].tolist()
+			left_taste_list, left_health_list = [leftlst[i][0] for i in range(len(leftlst))], [leftlst[i][1] for i in range(len(leftlst))]
+			right_taste_list, right_health_list = [rightlst[i][0] for i in range(len(rightlst))], [rightlst[i][1] for i in range(len(rightlst))]
+			fitness = self.cal_fitness(left_taste_list, right_health_list, left_health_list, right_taste_list, tmp_seq)
+			if fitness > max_fitness:
+				max_fitness = fitness
+				max_seq = deepcopy(tmp_seq)
+			# best_seq = deepcopy(max_seq)
+			tmp_seq = deepcopy(max_seq)
+			
+			# ind: health - fuzzy
+			# ind+1: health + fuzzy;
+			tmp_seq[ind+1][1] += pfuzzy_h
+			if tmp_seq[ind][1] >= pfuzzy_h:
+				tmp_seq[ind][1] -= pfuzzy_h
+			leftlst = tmp_seq[0:self.left_bound+1].tolist()
+			rightlst = tmp_seq[self.right_bound:].tolist()
+			left_taste_list, left_health_list = [leftlst[i][0] for i in range(len(leftlst))], [leftlst[i][1] for i in range(len(leftlst))]
+			right_taste_list, right_health_list = [rightlst[i][0] for i in range(len(rightlst))], [rightlst[i][1] for i in range(len(rightlst))]
+			fitness = self.cal_fitness(left_taste_list, right_health_list, left_health_list, right_taste_list, tmp_seq)
+			if fitness > max_fitness:
+				max_fitness = fitness
+				max_seq = deepcopy(tmp_seq)
+			# best_seq = deepcopy(max_seq)
+			tmp_seq = deepcopy(max_seq)
 
-		leftlst = best_seq[0:self.left_bound+1].tolist()
-		rightlst = best_seq[self.right_bound:].tolist()
+			
+		leftlst = tmp_seq[0:self.left_bound+1].tolist()
+		rightlst = tmp_seq[self.right_bound:].tolist()
 
 		left_taste_list, left_health_list = [leftlst[i][0] for i in range(len(leftlst))], [leftlst[i][1] for i in range(len(leftlst))]
 		right_taste_list, right_health_list = [rightlst[i][0] for i in range(len(rightlst))], [rightlst[i][1] for i in range(len(rightlst))]
@@ -205,5 +244,4 @@ class GA(object):
 		fitness = self.cal_fitness(left_taste_list, right_health_list, left_health_list, right_taste_list, best_seq)
 		# print(best_seq)
 
-		return fitness, best_seq
-
+		return fitness, tmp_seq
