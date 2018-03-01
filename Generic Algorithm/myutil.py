@@ -41,25 +41,36 @@ def MergeAndCount(lst, left, mid, right, temp):
 	k = left
 	cnt = 0
 
-	while i <= mid and j <= right:
-		if lst[i] <= lst[j]:
+	# while i <= mid and j <= right:
+	# 	if lst[i] <= lst[j]:
+	# 		temp[k] = lst[i]
+	# 		k = k + 1
+	# 		i = i + 1
+	# 	else:
+	# 		temp[k] = lst[j]
+	# 		k = k + 1
+	# 		j = j + 1
+	# 		cnt += mid -i + 1
+
+	# while i <= mid:
+	# 	temp[k] = lst[i]
+	# 	k = k + 1
+	# 	i = i + 1
+	# while j <= right:
+	# 	temp[k] = lst[j]
+	# 	k = k + 1
+	# 	j = j + 1
+
+	while k <= right:
+		if i <= mid and (lst[i] <= lst[j] or j > right):
 			temp[k] = lst[i]
-			k = k + 1
 			i = i + 1
 		else:
 			temp[k] = lst[j]
-			k = k + 1
 			j = j + 1
-			cnt += mid -i + 1
-
-	while i <= mid:
-		temp[k] = lst[i]
+			if i <= mid and lst[i] > lst[j]:
+				cnt += mid -i + 1
 		k = k + 1
-		i = i + 1
-	while j <= right:
-		temp[k] = lst[j]
-		k = k + 1
-		j = j + 1
 
 	for i in range(left, right + 1):
 		lst[i] = temp[i]
